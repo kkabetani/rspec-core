@@ -14,13 +14,14 @@ module RSpec
       attr_accessor :inclusion_patterns
       attr_accessor :exclusion_patterns
 
-      def initialize(inclusion_patterns=nil, exclusion_patterns=DEFAULT_EXCLUSION_PATTERNS.dup)
-        @exclusion_patterns = exclusion_patterns
-        @inclusion_patterns = inclusion_patterns || (exclusion_patterns.any? {|p| p =~ Dir.getwd} ? [Regexp.new(Dir.getwd)] : [])
+      def initialize(exclusion_patterns=nil, inclusion_patterns=nil)
+        @exclusion_patterns = exclusion_patterns || DEFAULT_EXCLUSION_PATTERNS.dup
+        @inclusion_patterns = inclusion_patterns ||
+         (@exclusion_patterns.any? {|p| p =~ Dir.getwd} ? [Regexp.new(Dir.getwd)] : [])
       end
 
       def exclude?(line)
-        @exclusion_patterns.any? {|p| p =~ line} and @inclusion_patterns.none? {|p| p =~ line}
+        @exclusion_patterns.any? {|p| p =~ line} && @inclusion_patterns.none? {|p| p =~ line}
       end
 
       def full_backtrace=(full_backtrace)
